@@ -348,8 +348,7 @@ def AddEquationsAero(aero_eq_manager):
             "F_z_total_cornering_fl{{i}}=F_z_total_fl{{i}} + Delta_Fz_lat_fl{{i}}",
             "F_z_total_cornering_fr{{i}}=F_z_total_fr{{i}} + Delta_Fz_lat_fr{{i}}",
             "F_z_total_cornering_rl{{i}}=F_z_total_rl{{i}} + Delta_Fz_lat_rl{{i}}",
-            "F_z_total_cornering_rr{{i}}=F_z_total_rr{{i}} + Delta_Fz_lat_rr{{i}}",
-            "F_z_total_rr{{i}} + Delta_Fz_lat_rr{{i}}",
+            "F_z_total_cornering_rr{{i}}=F_z_total_rr{{i}} + Delta_Fz_lat_rr{{i}}"
         ],
         relevant_vars=[
             ("F_z_total_cornering_fl", "Final front-left wheel normal load - cornering [N]"),
