@@ -57,7 +57,7 @@ def AddEquationsAero(aero_eq_manager):
             ("L",   "Characteristic length [m]"),
             ("eta", "Dynamic viscosity [Pa·s]")
         ],
-        vars_to_check=[(["Re", "rho", "v", "L"], 3)],
+        vars_to_check=[(["Re", "rho", "v", "L", "eta"], 4)],
         name="Reynolds Number"
     )
 
@@ -85,7 +85,7 @@ def AddEquationsAero(aero_eq_manager):
             ("A_ref",   "Aerodynamic reference area [m²]"),
             ("v",       "Vehicle velocity relative to air [m/s]")
         ],
-        vars_to_check=[(["F_d", "rho", "C_d", "A_ref", "v"], 3)],
+        vars_to_check=[(["F_d", "rho", "C_d", "A_ref", "v"], 4)],
         name="Aerodynamic Drag Force"
     )
 
@@ -100,7 +100,7 @@ def AddEquationsAero(aero_eq_manager):
             ("A_ref",    "Aerodynamic reference area [m²]"),
             ("v",        "Vehicle speed relative to air [m/s]")
         ],
-        vars_to_check=[(["F_y_aero","C_y"], 1)],
+        vars_to_check=[(["F_y_aero","C_y", "A_ref", "v", "rho"], 4)],
         name="Aerodynamic Lateral Force"
     )
 
@@ -153,7 +153,7 @@ def AddEquationsAero(aero_eq_manager):
             ("F_rr",        "Rolling resistance force [N]"),
             ("F_x_inertia", "Longitudinal inertial force [N]")
         ],
-        vars_to_check=[(["F_x_drive", "F_rr", "F_x_inertia"], 2)],
+        vars_to_check=[(["F_x_drive", "F_rr", "F_x_inertia", "F_d"], 3)],
         name="Longitudinal Force Equilibrium"
     )
 
@@ -166,7 +166,7 @@ def AddEquationsAero(aero_eq_manager):
             ("C_rr", "Rolling resistance coefficient [-]"),
             ("F_z",  "Generic normal force [N]")
         ],
-        vars_to_check=[(["C_rr", "F_z"], 1)],
+        vars_to_check=[(["C_rr", "F_z", "F_rr"], 2)],
         name="Rolling Resistance Force"
     )
 
@@ -255,56 +255,55 @@ def AddEquationsAero(aero_eq_manager):
     )
 
 
-    aero_eq_manager.add_equation_template(
-        equations_to_add=[
-            "C_d_sphere{{i}} = 24/Re{{i}} + 4/(0.4 + (Re{{i}}/282000)**0.65) + 0.4/(1 + (Re{{i}}/2.8e6)**0.65)"
-        ],
-        relevant_vars=[
-            ("C_d_sphere", "Drag coefficient of a sphere [-]"),
-            ("Re",         "Reynolds number [-]")
-        ],
-        vars_to_check=[(["C_d_sphere", "Re"], 1)],
-        name="Sphere Drag Coefficient (Re-dependent)"
-    )
+    # aero_eq_manager.add_equation_template(
+    #     equations_to_add=[
+    #         "C_d_sphere{{i}} = 24/Re{{i}} + 4/(0.4 + (Re{{i}}/282000)**0.65) + 0.4/(1 + (Re{{i}}/2.8e6)**0.65)"
+    #     ],
+    #     relevant_vars=[
+    #         ("C_d_sphere", "Drag coefficient of a sphere [-]"),
+    #         ("Re",         "Reynolds number [-]")
+    #     ],
+    #     vars_to_check=[(["C_d_sphere", "Re"], 1)],
+    #     name="Sphere Drag Coefficient (Re-dependent)"
+    # )
+
+    # aero_eq_manager.add_equation_template(
+    #     equations_to_add=[
+    #         "v_terminal{{i}} = sqrt((2*m{{i}}*g{{i}})/(rho{{i}}*C_d_sphere{{i}}*A_ref{{i}}))"
+    #     ],
+    #     relevant_vars=[
+    #         ("v_terminal", "Terminal velocity [m/s]"),
+    #         ("m",          "Mass [kg]"),
+    #         ("g",          "Gravitational acceleration [m/s²]"),
+    #         ("rho",        "Air density [kg/m³]"),
+    #         ("C_d_sphere", "Sphere drag coefficient [-]"),
+    #         ("A_ref",      "Reference area [m²]")
+    #     ],
+    #     vars_to_check=[(["v_terminal", "m", "g", "rho", "C_d_sphere", "A_ref"], 4)],
+    #     name="Terminal Velocity (Free Fall with Drag)"
+    # )
+
+    # aero_eq_manager.add_equation_template(
+    #     equations_to_add=[
+    #         "t_fall{{i}} = (m{{i}}/(rho{{i}}*C_d_sphere{{i}}*A_ref{{i}})) * log(v_terminal{{i}}/(v_terminal{{i}} - sqrt(2*g{{i}}*h{{i}})))"
+    #     ],
+    #     relevant_vars=[
+    #         ("t_fall",     "Time to fall from height h with drag [s]"),
+    #         ("m",          "Mass [kg]"),
+    #         ("rho",        "Air density [kg/m³]"),
+    #         ("C_d_sphere", "Sphere drag coefficient [-]"),
+    #         ("A_ref",      "Reference area [m²]"),
+    #         ("v_terminal", "Terminal velocity [m/s]"),
+    #         ("g",          "Gravitational acceleration [m/s²]"),
+    #         ("h",          "Fall height [m]")
+    #     ],
+    #     vars_to_check=[(["t_fall", "m", "rho", "C_d_sphere", "A_ref", "v_terminal", "g", "h"], 6)],
+    #     name="Time to Fall from Height with Drag"
+    # )
 
     aero_eq_manager.add_equation_template(
         equations_to_add=[
-            "v_terminal{{i}} = sqrt((2*m{{i}}*g{{i}})/(rho{{i}}*C_d_sphere{{i}}*A_ref{{i}}))"
-        ],
-        relevant_vars=[
-            ("v_terminal", "Terminal velocity [m/s]"),
-            ("m",          "Mass [kg]"),
-            ("g",          "Gravitational acceleration [m/s²]"),
-            ("rho",        "Air density [kg/m³]"),
-            ("C_d_sphere", "Sphere drag coefficient [-]"),
-            ("A_ref",      "Reference area [m²]")
-        ],
-        vars_to_check=[(["v_terminal", "m", "g", "rho", "C_d_sphere", "A_ref"], 4)],
-        name="Terminal Velocity (Free Fall with Drag)"
-    )
-
-    aero_eq_manager.add_equation_template(
-        equations_to_add=[
-            "t_fall{{i}} = (m{{i}}/(rho{{i}}*C_d_sphere{{i}}*A_ref{{i}})) * log(v_terminal{{i}}/(v_terminal{{i}} - sqrt(2*g{{i}}*h{{i}})))"
-        ],
-        relevant_vars=[
-            ("t_fall",     "Time to fall from height h with drag [s]"),
-            ("m",          "Mass [kg]"),
-            ("rho",        "Air density [kg/m³]"),
-            ("C_d_sphere", "Sphere drag coefficient [-]"),
-            ("A_ref",      "Reference area [m²]"),
-            ("v_terminal", "Terminal velocity [m/s]"),
-            ("g",          "Gravitational acceleration [m/s²]"),
-            ("h",          "Fall height [m]")
-        ],
-        vars_to_check=[(["t_fall", "m", "rho", "C_d_sphere", "A_ref", "v_terminal", "g", "h"], 6)],
-        name="Time to Fall from Height with Drag"
-    )
-
-    aero_eq_manager.add_equation_template(
-        equations_to_add=[
-            "t_coast{{i}} = (m{{i}}/(0.5*rho{{i}}*C_d{{i}}*A_ref{{i}}*v{{i}}))"
-            " * log(v{{i}}/v_final{{i}})"
+            "t_coast{{i}} = (m{{i}}/(0.5*rho{{i}}*C_d{{i}}*A_ref{{i}}*v{{i}})) * log(v{{i}}/v_final{{i}})"
         ],
         relevant_vars=[
             ("t_coast",  "Time to coast from v to v_final [s]"),
@@ -321,8 +320,7 @@ def AddEquationsAero(aero_eq_manager):
 
     aero_eq_manager.add_equation_template(
         equations_to_add=[
-            "s_coast{{i}} = (m{{i}}/(0.5*rho{{i}}*C_d{{i}}*A_ref{{i}}))"
-            " * (v{{i}} - v_final{{i}})"
+            "s_coast{{i}} = (m{{i}}/(0.5*rho{{i}}*C_d{{i}}*A_ref{{i}})) * (v{{i}} - v_final{{i}})"
         ],
         relevant_vars=[
             ("s_coast", "Coast-down distance [m]"),
@@ -389,7 +387,7 @@ def AddEquationsAero(aero_eq_manager):
             ("x_CG", "CG position from front axle [m]"),
             ("l_wb", "Wheelbase [m]")
         ],
-        vars_to_check=[(["a_CG", "x_CG"], 1)],
+        vars_to_check=[(["a_CG", "x_CG", "l_wb"], 2)],
         name="CG Distance Definitions (Front / Rear)"
     )
 
@@ -540,7 +538,7 @@ def AddEquationsAero(aero_eq_manager):
             ("T_arb",         "Anti-roll bar torque equivalent [N·m]"),
             ("t_track",       "Track width [m]")
         ],
-        vars_to_check=[(["F_z_arb_left", "T_arb", "t_track"], 2)],
+        vars_to_check=[(["F_z_arb_left", "T_arb", "t_track"], 2), (["F_z_arb_right", "T_arb", "t_track"], 2)],
         name="Anti-Roll Bar Vertical Wheel Forces"
     )
 
@@ -557,7 +555,7 @@ def AddEquationsAero(aero_eq_manager):
             ("a_CG",            "CG distance to front axle [m]"),
             ("b_CG",            "CG distance to rear axle [m]")
         ],
-        vars_to_check=[(["delta_z_wheel_f", "delta_z_heave", "theta_pitch"], 2)],
+        vars_to_check=[(["delta_z_wheel_f", "delta_z_heave", "theta_pitch", "a_CG"], 3), (["delta_z_wheel_r", "delta_z_heave", "theta_pitch", "b_CG"], 3)],
         name="Wheel Displacement from Heave and Pitch"
     )
 
@@ -598,7 +596,7 @@ def AddEquationsAero(aero_eq_manager):
             ("F_z_susp",       "Spring-based suspension force [N]"),
             ("F_bump",         "Bump stop force [N]")
         ],
-        vars_to_check=[(["F_z_susp_total", "F_z_susp"], 1)],
+        vars_to_check=[(["F_z_susp_total", "F_z_susp", "F_bump"], 2)],
         name="Total Suspension Force Including Bump Stop"
     )
 
@@ -626,7 +624,7 @@ def AddEquationsAero(aero_eq_manager):
             ("Delta_Fz_long",       "Load transfer from CG height [N]"),
             ("Delta_Fz_long_geom",  "Geometric load transfer component [N]")
         ],
-        vars_to_check=[(["Delta_Fz_long_total", "Delta_Fz_long"], 1)],
+        vars_to_check=[(["Delta_Fz_long_total", "Delta_Fz_long", "Delta_Fz_long_geom"], 2)],
         name="Net Longitudinal Load Transfer Including Geometry"
     )
 
@@ -720,7 +718,7 @@ def AddEquationsAero(aero_eq_manager):
             ("mu",            "Tyre-road friction coefficient [-]"),
             ("theta_bank",    "Bank angle [rad]")
         ],
-        vars_to_check=[(["F_y_available", "F_z", "mu", "theta_bank"], 2)],
+        vars_to_check=[(["F_y_available", "F_z", "mu", "theta_bank"], 3)],
         name="Available Lateral Force on Banked Surface (for flat roads, theta_bank=0)"
     )
 
@@ -733,7 +731,7 @@ def AddEquationsAero(aero_eq_manager):
             ("F_centripetal", "Required centripetal force [N]"),
             ("F_y_available", "Available lateral force [N]")
         ],
-        vars_to_check=[(["F_centripetal", "F_y_available"], 2)],
+        vars_to_check=[(["F_centripetal", "F_y_available"], 1)],
         name="Banked Turn Lateral Force Limit"
     )
 
@@ -774,7 +772,7 @@ def AddEquationsAero(aero_eq_manager):
             ("g", "Gravitational acceleration [m/s²]"),
             ("h", "Altitude [m]")
         ],
-        vars_to_check=[(["p", "p_0", "rho_0", "g", "h"], 3)],
+        vars_to_check=[(["p", "p_0", "rho_0", "g", "h"], 4)],
         name="Barometric Formula"
     )
     aero_eq_manager.add_equation_template(
@@ -786,7 +784,7 @@ def AddEquationsAero(aero_eq_manager):
             ("h", "Altitude [m]"),
             ("p_0", "Sea level standard atmospheric pressure [Pa]")
         ],
-        vars_to_check=[(["rho", "rho_0", "g", "h", "p_0"], 3)],
+        vars_to_check=[(["rho", "rho_0", "g", "h", "p_0"], 4)],
         name="Density Variation with Altitude"
     )
 
@@ -818,7 +816,7 @@ def AddEquationsAero(aero_eq_manager):
             ("x_rel_aero",   "Longitudinal lever arm from CG to COP [m]"),
             ("z_rel_aero",   "Vertical lever arm from CG to COP [m]")
         ],
-        vars_to_check=[(["M_pitch_aero", "F_z_df", "x_rel_aero"], 2)],
+        vars_to_check=[(["M_pitch_aero", "F_z_df", "x_rel_aero", "z_rel_aero", "F_d"], 4)],
         name="Aerodynamic Pitching Moment about CG"
     )
 
@@ -900,7 +898,7 @@ def AddEquationsAero(aero_eq_manager):
             ("Delta_Fz_long_r", "Rear axle normal load change from longitudinal effects [N]"),
             ("Delta_Fz_long",   "Total longitudinal load transfer [N]")
         ],
-        vars_to_check=[(["Delta_Fz_long_f", "Delta_Fz_long"], 1)],
+        vars_to_check=[(["Delta_Fz_long_f", "Delta_Fz_long"], 1), (["Delta_Fz_long_r", "Delta_Fz_long"], 1)],
         name="Longitudinal Load Transfer Axle Split"
     )
 
@@ -990,7 +988,7 @@ def AddEquationsAero(aero_eq_manager):
             ("Delta_Fz_lat_rr", "Rear-right load change from lateral effects [N]")
         ],
         vars_to_check=[(["Delta_Fz_lat_fl", "Delta_Fz_lat_f"], 1)],
-        name="Lateral Load Transfer Per Wheel"
+        name="Lateral Load Transfer Per Wheel (clockwise positive turn)"
     )
 
     aero_eq_manager.add_equation_template(
@@ -1060,7 +1058,11 @@ def AddEquationsAero(aero_eq_manager):
         ],
         relevant_vars=[
             ("F_z_static_df_f", "Front axle normal force: static + downforce [N]"),
-            ("F_z_static_df_r", "Rear axle normal force: static + downforce [N]")
+            ("F_z_static_df_r", "Rear axle normal force: static + downforce [N]"),
+            ("F_z_static_f",    "Static front axle normal force [N]"),
+            ("F_z_df_f",        "Front axle aerodynamic downforce [N]"),
+            ("F_z_static_r",    "Static rear axle normal force [N]"),
+            ("F_z_df_r",        "Rear axle aerodynamic downforce [N]")
         ],
         vars_to_check=[(["F_z_static_df_f", "F_z_static_f", "F_z_df_f"], 2)],
         name="Normal Force: Static + Downforce (Axle)"
@@ -1077,7 +1079,15 @@ def AddEquationsAero(aero_eq_manager):
             ("F_z_static_df_fl", "Front-left normal force: static + downforce [N]"),
             ("F_z_static_df_fr", "Front-right normal force: static + downforce [N]"),
             ("F_z_static_df_rl", "Rear-left normal force: static + downforce [N]"),
-            ("F_z_static_df_rr", "Rear-right normal force: static + downforce [N]")
+            ("F_z_static_df_rr", "Rear-right normal force: static + downforce [N]"),
+            ("F_z_static_fl",    "Static front-left normal force [N]"),
+            ("F_z_df_fl",        "Front-left aerodynamic downforce [N]"),
+            ("F_z_static_fr",    "Static front-right normal force [N]"),
+            ("F_z_df_fr",        "Front-right aerodynamic downforce [N]"),
+            ("F_z_static_rl",    "Static rear-left normal force [N]"),
+            ("F_z_df_rl",        "Rear-left aerodynamic downforce [N]"),
+            ("F_z_static_rr",    "Static rear-right normal force [N]"),
+            ("F_z_df_rr",        "Rear-right aerodynamic downforce [N]")
         ],
         vars_to_check=[(["F_z_static_df_fl", "F_z_static_fl", "F_z_df_fl"], 2)],
         name="Normal Force: Static + Downforce (Per Wheel)"
@@ -1094,7 +1104,15 @@ def AddEquationsAero(aero_eq_manager):
             ("F_z_static_df_drag_fl", "Front-left normal force: static + downforce + drag moment [N]"),
             ("F_z_static_df_drag_fr", "Front-right normal force: static + downforce + drag moment [N]"),
             ("F_z_static_df_drag_rl", "Rear-left normal force: static + downforce + drag moment [N]"),
-            ("F_z_static_df_drag_rr", "Rear-right normal force: static + downforce + drag moment [N]")
+            ("F_z_static_df_drag_rr", "Rear-right normal force: static + downforce + drag moment [N]"),
+            ("F_z_static_df_fl",      "Front-left normal force: static + downforce [N]"),
+            ("Delta_Fz_drag_fl",      "Front-left normal load change from drag moment [N]"),
+            ("F_z_static_df_fr",      "Front-right normal force: static + downforce [N]"),
+            ("Delta_Fz_drag_fr",      "Front-right normal load change from drag moment [N]"),
+            ("F_z_static_df_rl",      "Rear-left normal force: static + downforce [N]"),
+            ("Delta_Fz_drag_rl",      "Rear-left normal load change from drag moment [N]"),
+            ("F_z_static_df_rr",      "Rear-right normal force: static + downforce [N]"),
+            ("Delta_Fz_drag_rr",      "Rear-right normal load change from drag moment [N]")
         ],
         vars_to_check=[(["F_z_static_df_drag_fl", "F_z_static_df_fl", "Delta_Fz_drag_fl"], 2)],
         name="Normal Force: Static + Downforce + Drag Moment (Per Wheel)"
@@ -1113,7 +1131,7 @@ def AddEquationsAero(aero_eq_manager):
             ("x_CG",         "CG distance from front axle [m]"),
             ("l_wb",         "Wheelbase [m]")
         ],
-        vars_to_check=[(["F_z_static_f", "W", "x_CG", "l_wb"], 3)],
+        vars_to_check=[(["F_z_static_f", "W", "x_CG", "l_wb"], 3), (["F_z_static_r", "W", "x_CG", "l_wb"], 3)],
         name="Static Normal Force Axle Split"
     )
 
@@ -1143,7 +1161,9 @@ def AddEquationsAero(aero_eq_manager):
             ("F_z_df_fl", "Front-left aerodynamic downforce [N]"),
             ("F_z_df_fr", "Front-right aerodynamic downforce [N]"),
             ("F_z_df_rl", "Rear-left aerodynamic downforce [N]"),
-            ("F_z_df_rr", "Rear-right aerodynamic downforce [N]")
+            ("F_z_df_rr", "Rear-right aerodynamic downforce [N]"),
+            ("F_z_df_f",  "Front axle aerodynamic downforce [N]"),
+            ("F_z_df_r",  "Rear axle aerodynamic downforce [N]")
         ],
         vars_to_check=[(["F_z_df_fl", "F_z_df_f"], 1)],
         name="Aerodynamic Downforce Per Wheel"
@@ -1175,7 +1195,9 @@ def AddEquationsAero(aero_eq_manager):
             ("Delta_Fz_drag_fl", "Front-left normal load change from drag moment [N]"),
             ("Delta_Fz_drag_fr", "Front-right normal load change from drag moment [N]"),
             ("Delta_Fz_drag_rl", "Rear-left normal load change from drag moment [N]"),
-            ("Delta_Fz_drag_rr", "Rear-right normal load change from drag moment [N]")
+            ("Delta_Fz_drag_rr", "Rear-right normal load change from drag moment [N]"),
+            ("Delta_Fz_drag_f",  "Front axle normal load change from drag moment [N]"),
+            ("Delta_Fz_drag_r",  "Rear axle normal load change from drag moment [N]")
         ],
         vars_to_check=[(["Delta_Fz_drag_fl", "Delta_Fz_drag_f"], 1)],
         name="Drag-Induced Normal Load Shift (Per Wheel)"
